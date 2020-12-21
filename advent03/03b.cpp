@@ -2,6 +2,9 @@
 #include <iostream>
 #include <string>
 
+// To build:
+// g++ 03b.cpp -std=c++11
+
 const char Tree = '#';
 const int NewlineLength = 1;
 const char* Filename = "advent03.txt";
