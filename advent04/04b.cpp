@@ -108,8 +108,7 @@ public:
         }
 
         std::regex hairExpr("#[0-9a-f]{6}");
-        valid = std::regex_match(this->hairColor, hairExpr);
-        if (!valid) {
+        if (!std::regex_match(this->hairColor, hairExpr)) {
             return false;
         }
 
@@ -122,8 +121,7 @@ public:
         }
 
         std::regex passportExpr("[0-9]{9}");
-        valid = std::regex_match(this->passportID, passportExpr);
-        if (!valid) {
+        if (!std::regex_match(this->passportID, passportExpr)) {
             return false;
         }
 
