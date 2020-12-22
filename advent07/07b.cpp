@@ -38,7 +38,7 @@ class Deps {
 public:
     std::unordered_map<std::string, std::unordered_set<Target>> deps;
 
-    void LoadStringReverseDeps(std::string& str) {
+    void LoadLine(std::string& str) {
         
         auto bags = str.find(" bags");
         std::string containerBag(str.begin(), str.begin() + bags);
@@ -94,7 +94,7 @@ public:
         for (auto const& [k, v] : this->deps) {
             std::cout << k << std::endl;
             for (auto const& s : v) {
-                std::cout << "   " << s.target << " (" << int(s.bagCount) << ")" << std::endl;
+                std::cout << "   " << s.target << " (" << s.bagCount << ")" << std::endl;
             }
         }
     }
@@ -105,7 +105,7 @@ int main(int argc, char** argv) {
     std::string line;
 
     while (std::getline(std::cin, line)) {
-        deps.LoadStringReverseDeps(line);
+        deps.LoadLine(line);
     }
 
     // don't need to count the outer bag.
