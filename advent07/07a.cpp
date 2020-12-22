@@ -60,7 +60,7 @@ public:
     int CountItemsTargeting(const std::string& target) {
         int count = 0;
         for (auto const& [k, v] : this->deps) {
-            if (!(k == target) && this->ItemCanContain(k, target)) {
+            if (k != target && this->ItemCanContain(k, target)) {
                 count++;
             }
         }
