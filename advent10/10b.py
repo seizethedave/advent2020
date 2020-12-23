@@ -18,7 +18,7 @@ def search(i):
             if jolts[j] - jolts[i] <= diff_max:
                 count += search(j)
         except IndexError:
-            pass
+            break
 
     return count
 
