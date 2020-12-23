@@ -28,9 +28,10 @@ public:
     }
 
     bool IsValid(int64_t value) {
-        for (auto const& a : this->window) {
-            for (auto const& b : this->window) {
-                if (a != b && a + b == value) {
+        for (auto i = this->window.begin(); i != this->window.end(); ++i) {
+            auto j = i;
+            for (++j; j != this->window.end(); ++j) {
+                if (*i != *j && *i + *j == value) {
                     return true;
                 }
             }
