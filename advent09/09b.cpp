@@ -15,6 +15,10 @@ public:
     SumWindow(const int64_t target)
      : items(), sum(0), target(target) { }
 
+    /**
+     * Adds the value to the sliding window, reducing the window if it flows over.
+     * Returns whether the window sums to the target.
+     */
     bool Add(int64_t value) {
         this->items.push_front(value);
         this->sum += value;
@@ -23,10 +27,7 @@ public:
             this->sum -= this->items.back();
             this->items.pop_back();
         }
-        if (this->sum == this->target) {
-            return true;
-        }
-        return false;
+        return this->sum == this->target;
     }
 
     int64_t Min() const {
