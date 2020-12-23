@@ -23,8 +23,11 @@ def transform(seats):
 
     for y, row in enumerate(seats):
         for x, seatval in enumerate(row):
+            if seatval == Floor:
+                continue
+
             occupied_neighbors = len(
-                list(filter(lambda n: n == Occupied, iter_adjacent(y, x, seats)))
+                [n for n in iter_adjacent(y, x, seats) if n == Occupied]
             )
 
             if seatval == Empty and occupied_neighbors == 0:
@@ -32,14 +35,11 @@ def transform(seats):
             elif seatval == Occupied and occupied_neighbors >= 4:
                 actions.append((y, x, Empty))
 
-    if not actions:
-        return False
-
     # Otherwise apply the actions.
     for y, x, state in actions:
         seats[y][x] = state
 
-    return True
+    return len(actions) > 0
 
 while True:
     if not transform(lines):
