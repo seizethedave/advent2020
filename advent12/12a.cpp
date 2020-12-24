@@ -15,28 +15,26 @@ public:
     void Navigate(char action, int number) {
         switch (action) {
         case 'L':
-            this->direction = (this->direction - number) % 360;
-            break;
-        case 'R':
             this->direction = (this->direction + number) % 360;
             break;
+        case 'R':
+            this->direction = (this->direction - number) % 360;
+            break;
         case 'F':
-            this->Move(
-                int(std::cos(deg2rad(this->direction)) * number),
-                int(std::sin(deg2rad(this->direction)) * number)
-            );
+            this->x += std::round(std::cos(deg2rad(this->direction)) * number);
+            this->y += std::round(std::sin(deg2rad(this->direction)) * number);
             break;
         case 'N':
-            this->Move(0, -number);
+            this->y += number;
             break;
         case 'E':
-            this->Move(number, 0);
+            this->x += number;
             break;
         case 'S':
-            this->Move(0, number);
+            this->y -= number;
             break;
         case 'W':
-            this->Move(-number, 0);
+            this->x -= number;
             break;
         }
     }
@@ -48,11 +46,6 @@ private:
     int x = 0;
     int y = 0;
     int direction = 0;
-
-    void Move(int dx, int dy) {
-        this->x += dx;
-        this->y += dy;
-    }
 };
 
 int main(int argc, char** argv) {
