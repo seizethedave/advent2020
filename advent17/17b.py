@@ -36,7 +36,7 @@ def transform():
     for x in range(frontier[0][0], frontier[0][1] + 1):
         for y in range(frontier[1][0], frontier[1][1] + 1):
             for z in range(frontier[2][0], frontier[2][1] + 1):
-                for w in range(frontier[2][0], frontier[2][1] + 1):
+                for w in range(frontier[3][0], frontier[3][1] + 1):
                     c = (x, y, z, w)
                     actives = len(active_neighbors(x, y, z, w))
                     if c in data:
