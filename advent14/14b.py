@@ -4,9 +4,10 @@ import itertools
 
 def float_values(val, float_positions):
     """
-    float pos's = [0, 3, 6] if Xs were in 0,3,5 slots (LSB).
+    float pos's = [0, 3, 5] if Xs were in 0,3,5 slots (LSB).
     """
     for seq in itertools.product(['0', '1'], repeat=len(float_positions)):
+        # seq is a string like '0101'.
         mask = 0
         realmask = 0
         for i, bit in enumerate(int(b) for b in seq):
