@@ -2,41 +2,37 @@ import sys
 import re
 import itertools
 
-def float_values(val, float_positions):
-    """
-    float pos's = [0, 3, 5] if Xs were in 0,3,5 slots (LSB).
-    """
-    for seq in itertools.product(['0', '1'], repeat=len(float_positions)):
-        # seq is a string like '0101'.
-        mask = 0
-        realmask = 0
-        for i, bit in enumerate(int(b) for b in seq):
-            mask |= bit << float_positions[i]
-            realmask |= 1 << float_positions[i]
-        yield (val & ~realmask) | mask
-
 class Machine:
     def __init__(self):
         self.memory = {}
         self.mask_x_positions = []
-        self.mask_mask = 0
         self.mask_bits = 0
 
     def set_mask(self, mask):
         self.mask_x_positions = []
-        self.mask_mask = 0
         self.mask_bits = 0
         for i, ch in enumerate(reversed(mask)):
             if ch == "X":
                 self.mask_x_positions.append(i)
-            else:
-                self.mask_mask |= 1 << i
-                if ch == "1":
-                    self.mask_bits |= 1 << i
+            elif ch == "1":
+                self.mask_bits |= 1 << i
 
     def set_value(self, addr, val):
-        for a in float_values(addr | self.mask_bits, self.mask_x_positions):
+        for a in self.float_values(addr | self.mask_bits):
             self.memory[a] = val
+
+    def float_values(self, val):
+        """
+        float pos's = [0, 3, 5] if Xs were in 0,3,5 slots (LSB).
+        """
+        for seq in itertools.product(['0', '1'], repeat=len(self.mask_x_positions)):
+            # seq is a string like '0101'.
+            mask = 0
+            realmask = 0
+            for i, bit in enumerate(int(b) for b in seq):
+                mask |= bit << self.mask_x_positions[i]
+                realmask |= 1 << self.mask_x_positions[i]
+            yield (val & ~realmask) | mask
 
     def sum_values(self):
         return sum(self.memory.values())
