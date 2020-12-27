@@ -9,9 +9,7 @@ def load_input():
         if line == "\n":
             break
         rules.extend(
-            (int(a), int(b))
-            for a, b in
-            re.findall("(\d+)-(\d+)", line)
+            (int(a), int(b)) for a, b in re.findall("(\d+)-(\d+)", line)
         )
     # Skip until start of "nearby tickets" data.
     sys.stdin.readline()
