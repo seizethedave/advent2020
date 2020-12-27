@@ -18,14 +18,6 @@ class Machine:
                 self.mask_bits |= 1 << i
 
     def set_value(self, addr, val):
-        for a in self.float_values(addr | self.mask_bits):
-            self.memory[a] = val
-
-    def float_values(self, val):
-        """
-        float pos's = [0, 3, 5] if Xs were in 0,3,5 slots (LSB).
-        """
-
         for seq in itertools.product((0, 1), repeat=len(self.mask_x_positions)):
             # seq will take on ALL k-bit tuples (0, 0, 0), (0, 0, 1), ..., (1, 1, 1).
             mask = 0
@@ -33,7 +25,8 @@ class Machine:
             for i, bit in enumerate(seq):
                 mask |= bit << self.mask_x_positions[i]
                 realmask |= 1 << self.mask_x_positions[i]
-            yield (val & ~realmask) | mask
+            new_addr = ((addr | self.mask_bits) & ~realmask) | mask
+            self.memory[new_addr] = val
 
     def sum_values(self):
         return sum(self.memory.values())
