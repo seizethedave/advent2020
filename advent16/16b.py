@@ -43,20 +43,20 @@ def illegal_rules(n):
             if lo <= n <= hi:
                 break # legal.
         else:
-            yield name
+            yield name # None legal for this rule.
 
 final_defs = [None] * len(my_ticket)
 
-def finalize_index(index, rule_name):
-    final_defs[index] = rule_name
-    for i, c in enumerate(candidates):
-        if i != index:
-            discard_candidate(i, rule_name)
-
 def discard_candidate(index, rule_name):
+    # Every time we discard a candidate rule, if we drop to 1 rule for the index, we can
+    # recursively eliminate that rule from all other indices. (which may drop to 1...)
     candidates[index].discard(rule_name)
     if len(candidates[index]) == 1 and not final_defs[index]:
-        finalize_index(index, list(candidates[index])[0])
+        remaining_rule = list(candidates[index])[0]
+        final_defs[index] = remaining_rule
+        for i in range(len(candidates)):
+            if i != index:
+                discard_candidate(i, remaining_rule)
 
 for line in sys.stdin:
     items = [int(n) for n in line.split(",")]
