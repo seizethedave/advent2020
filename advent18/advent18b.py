@@ -41,7 +41,4 @@ def eval_expr_iter(it):
     return operands[0]
 
 if __name__ == "__main__":
-    total = 0
-    for line in sys.stdin:
-        total += eval_expr(line.rstrip())
-    print(total)
+    print(sum(eval_expr(line.rstrip()) for line in sys.stdin))
