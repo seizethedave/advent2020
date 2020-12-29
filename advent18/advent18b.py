@@ -16,8 +16,7 @@ def eval_expr_iter(it):
             continue
         elif c.isdecimal():
             operands.append(int(c))
-        elif c in operators:
-            op = operators[c]
+        elif op := operators.get(c):
             try:
                 lastop = opstack[-1]
             except IndexError:
