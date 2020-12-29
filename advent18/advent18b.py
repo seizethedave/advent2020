@@ -1,6 +1,8 @@
 import sys
 import operator
 
+# cat input.txt | python3.9 advent18b.py
+
 def eval_expr(expr):
     return eval_expr_iter(iter(expr))
 
@@ -29,8 +31,7 @@ def eval_expr_iter(it):
             opstack.append(op)
         elif c == '(':
             operands.append(eval_expr_iter(it))
-
-        if c == ')':
+        elif c == ')':
             break
 
     while opstack:
