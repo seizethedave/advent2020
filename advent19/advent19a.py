@@ -8,6 +8,10 @@ class Terminal:
         return (True, len(self.val)) if text[offset:].startswith(self.val) else (False, 0)
 
 class Seq(list):
+    @classmethod
+    def from_string(cls, s):
+        return cls(int(n) for n in s.split())
+
     def matches(self, text, offset, rules):
         totalmatchlen = 0
         for rule_id in self:
@@ -34,10 +38,6 @@ class Disjunction:
     def __repr__(self):
         return f"Disjunction({repr(self.items)})"
 
-def seq_from_string(s):
-    "'6 7' -> Seq([6, 7])"
-    return Seq(int(n) for n in s.split())
-
 rules = {}
 
 def load_rules():
@@ -48,13 +48,11 @@ def load_rules():
         rule_id = int(rule_id)
         rhs = rhs.strip()
         if rhs.startswith('"'):
+            # A string terminal.
             val = Terminal(rhs.strip('"'))
         else:
-            sequences = rhs.split("|")
-            if len(sequences) > 1:
-                val = Disjunction([seq_from_string(fragment) for fragment in sequences])
-            else:
-                val = seq_from_string(rhs)
+            # Non-terminal: 1+ sequences of terminals OR'd together (a disjunction).
+            val = Disjunction([Seq.from_string(fragment) for fragment in rhs.split("|")])
         rules[rule_id] = val
 
 def does_match(s, rules, rule_id):
