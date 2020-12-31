@@ -13,16 +13,13 @@ class Seq(list):
     def from_string(cls, s):
         return cls(int(n) for n in s.split())
 
-    def prefix_suffix(self):
-        return Seq(self[0:1]), (Seq(self[1:]) if len(self) > 1 else None)
-
     def matches(self, text, offset, rules):
         if len(self) == 1:
             rule = rules[self[0]]
             yield from rule.matches(text, offset, rules)
             return
 
-        prefix, suffix = self.prefix_suffix()
+        prefix, suffix = Seq(self[:1]), Seq(self[1:])
 
         for m in prefix.matches(text, offset, rules):
             for submatch in suffix.matches(text, offset + m, rules):
