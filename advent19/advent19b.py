@@ -5,23 +5,28 @@ class Terminal:
         self.val = val
 
     def matches(self, text, offset, rules):
-        return (True, len(self.val)) if text[offset:].startswith(self.val) else (False, 0)
+        if text[offset:].startswith(self.val):
+            yield len(self.val)
 
 class Seq(list):
     @classmethod
     def from_string(cls, s):
         return cls(int(n) for n in s.split())
 
+    def prefix_suffix(self):
+        return Seq(self[0:1]), (Seq(self[1:]) if len(self) > 1 else None)
+
     def matches(self, text, offset, rules):
-        totalmatchlen = 0
-        for rule_id in self:
-            rule = rules[rule_id]
-            match, matchlen = rule.matches(text, offset + totalmatchlen, rules)
-            if not match:
-                return False, 0
-            totalmatchlen += matchlen
-        else:
-            return True, totalmatchlen
+        if len(self) == 1:
+            rule = rules[self[0]]
+            yield from rule.matches(text, offset, rules)
+            return
+
+        prefix, suffix = self.prefix_suffix()
+
+        for m in prefix.matches(text, offset, rules):
+            for submatch in suffix.matches(text, offset + m, rules):
+                yield m + submatch
 
 class Disjunction:
     def __init__(self, items):
@@ -29,11 +34,7 @@ class Disjunction:
 
     def matches(self, text, offset, rules):
         for item in self.items:
-            match, matchlen = item.matches(text, offset, rules)
-            if match:
-                return True, matchlen
-        else:
-            return False, 0
+            yield from item.matches(text, offset, rules)
 
     def __repr__(self):
         return f"Disjunction({repr(self.items)})"
@@ -57,8 +58,11 @@ def load_rules():
 
 def does_match(s, rules, rule_id):
     rule = rules[rule_id]
-    match, matchlen = rule.matches(s, 0, rules)
-    return match and matchlen == len(s)
+    for m in rule.matches(s, 0, rules):
+        if m == len(s):
+            return True
+    else:
+        return False
 
 if __name__ == "__main__":
     load_rules()
