@@ -126,8 +126,6 @@ while visit_queue:
                         visit_queue.append(t2)
                         break
 
-grid_size = 12 * (10 - 2)
-
 def grouper(iterable, n, fillvalue=None):
     "Collect data into fixed-length chunks or blocks"
     # grouper('ABCDEFG', 3, 'x') --> ABC DEF Gxx"
@@ -146,9 +144,8 @@ def get_master_grid():
         row = row.down
 
 # Form amorphous chars yielded from get_master_grid into new large NxN master grid.
-big_grid = []
-for row in grouper(get_master_grid(), grid_size, fillvalue=None):
-    big_grid.append(list(row))
+grid_size = 12 * (10 - 2)
+big_grid = [list(row) for row in grouper(get_master_grid(), grid_size)]
 
 def is_monster_at_pos(grid, x, y):
     for my, row in enumerate(Monster):
@@ -169,12 +166,12 @@ def find_monsters_1d(grid):
 
 def find_monsters_all_transforms():
     master = Tile("master")
-    master.grid = copy.deepcopy(big_grid)
 
     for flip, rot in [
         (None, 0), (None, 90), (None, 180), (None, 270),
         (FlipH, 0), (FlipH, 90), (FlipV, 0), (FlipV, 90),
     ]:
+        master.grid = copy.deepcopy(big_grid)
         master.transform(flip, rot)
         monsters = find_monsters_1d(master.grid)
         if monsters:
