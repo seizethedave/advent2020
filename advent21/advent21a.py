@@ -195,26 +195,6 @@ class Solver:
         self.unassigned_ingredients.update(ingredients)
         self.allergy_free_ingredients.update(ingredients)
 
-    def is_valid(self):
-        """
-        Valid if:
-        - an allergen does not appear under two different ingredients.
-        - for each food f:
-            |f.ingredients| >= |f.allergens|
-        """
-        c = Counter(self.ingredients.values())
-        maxcount = max(c.values())
-        if maxcount > 1:
-            print(f"  not valid maxcount={maxcount}")
-            return False
-
-        for f_ingredients, f_allergens in self.foods:
-            if len(f_ingredients) < len(f_allergens):
-                print(f"  not valid maxcount={len(f_ingredients)} < {len(f_allergens)}")
-                return False
-        else:
-            return True
-        
     def assign(self, ingredient, allergen):
         self.ingredients[ingredient] = allergen
         self.unassigned_ingredients.remove(ingredient)
@@ -231,27 +211,26 @@ class Solver:
         self.unassigned_ingredients.add(ingredient)
         self.unassigned_allergens.add(allergen)
 
-    def solve(self, level):
+    def solve(self):
         if not self.unassigned_allergens:
             self.allergy_free_ingredients &= self.unassigned_ingredients
-
-            print("  " * level, self.unassigned_ingredients)
-            print("  " * level, self.ingredients)
-            print("  " * level, self.foods)
-            counter = Counter()
-            for f_ingredients, _ in self.foods:
-                counter.update(i for i in f_ingredients if i in self.unassigned_ingredients)
-            print("  " * level, sum(counter.values()))
             return
 
-        for ingredient in self.unassigned_ingredients:
-            for allergen in self.unassigned_allergens:
-                foods_copy = self.assign(ingredient, allergen)
-                if self.is_valid():
-                    print("  " * level, f"chose {ingredient} -> {allergen}")
-                    self.solve(level + 1)
-                self.unassign(ingredient, allergen, foods_copy)
+        def eligible_for_allergen(ing, allerg):
+            for fi, fa in self.foods:
+                if allerg in fa and ing not in fi:
+                    return False
+            return True
 
+        for ingredient in self.unassigned_ingredients:
+            candidate_allergens = set(self.unassigned_allergens)
+            for allergen in candidate_allergens:
+                if not eligible_for_allergen(ingredient, allergen):
+                    continue
+
+                foods_copy = self.assign(ingredient, allergen)
+                self.solve()
+                self.unassign(ingredient, allergen, foods_copy)
 
 s = Solver()
 
@@ -261,5 +240,11 @@ for line in sys.stdin:
     allergens = allergens[9:-1].rstrip("\n)").split(", ")
     s.add_food(ingredients, allergens)
 
-s.solve(0)
+s.solve()
 print(s.allergy_free_ingredients)
+
+c = Counter()
+for f_i, _ in s.foods:
+    c.update(f_i & s.allergy_free_ingredients)
+    
+print(sum(c.values()))
