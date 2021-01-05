@@ -1,183 +1,6 @@
-"""
-have series of 
-ingredient1 ingredient2 ... ingredientN (contains allergen1, allergen2,...)
-ingredient1 ingredient2 ... ingredientM (contains allergen1, allergen2,...)
-
-Want to figure out which ingredientJ's cannot contain the listed allergens.
-Then count how many times ingredientJ appears in any food.
-Each step should eliminate ingredients that CAN/DO contain a listed allergen.
-
-Food1
-ingred:
-    i1
-    i2
-allergen:
-    a1
-
-Food2
-ingred:
-    i2
-    i3
-allergen:
-    a2
-    a3
-
-presume i1 -> a1.
-
-Food1
-ingred:
-    i2
-allergen:
-
-Food2
-ingred:
-    i2
-    i3
-allergen:
-    a2
-    a3
-
-if valid:
-    presume i2 -> a2
-
-    Food1
-    ingred:
-        i2
-    allergen:
-
-    Food2
-    ingred:
-        i3
-    allergen:
-        a3 
-    
-    if valid:
-        presume i3 -> a3
-
-        Food1
-        ingred:
-            i2
-        allergen:
-
-        Food2
-        ingred:
-        allergen:
-
-        result is 1.
-
-Ex 2:
-
-Food1
-ingred:
-    i1
-    i2
-allergen:
-    a1
-
-Food2
-ingred:
-    i1
-    i3
-allergen:
-    a2
-    a3
-
-
-presume i1 -> a1.
-
-
-
-Food1
-ingred:
-    i2
-allergen:
-    -
-Food2
-ingred:
-    i3
-allergen:
-    a2
-    a3
-
-Not valid, a2/3 must correspond to i1/i3.
-
-revert:
-
-Food1
-ingred:
-    i1
-    i2
-allergen:
-    a1
-
-Food2
-ingred:
-    i1
-    i3
-allergen:
-    a2
-    a3
-
-next, presume i2 -> a1
-
-Food1
-ingred:
-    i1
-allergen:
-
-Food2
-ingred:
-    i1
-    i3
-allergen:
-    a2
-    a3
-
-(i2 -> a1)
-
-if valid:
-    presume i1->a2
-
-    Food1
-    ingred:
-    allergen:
-
-    Food2
-    ingred:
-        i3
-    allergen:
-        a3
-
-    (i2 -> a1,
-     i1 -> a2)
-
-    valid, so presume i3 -> a3. done. 0 unknowns.
-
-Top level:
-{ingredient -> allergen}
-initially {ingredient -> None}.
-
-A = list of all allergens.
-
-Food:
-    set(ingredient)
-    set(allergen)
-
-F = list of Foods.
-
-At each move: take unknown ingredient.
-
-do {
-    Assign arbitrary allergen.
-} while invalid();
-
-if valid:
-    recurse
-
-"""
-
 from collections import Counter
 import copy
+from operator import itemgetter
 from pprint import pprint
 import sys
 
@@ -188,6 +11,7 @@ class Solver:
         self.unassigned_allergens = set()
         self.unassigned_ingredients = set()
         self.allergy_free_ingredients = set()
+        self.solution = None
 
     def add_food(self, ingredients, allergens):
         self.foods.append((set(ingredients), set(allergens)))
@@ -214,6 +38,8 @@ class Solver:
     def solve(self):
         if not self.unassigned_allergens:
             self.allergy_free_ingredients &= self.unassigned_ingredients
+            if self.solution is None:
+                self.solution = copy.deepcopy(self.ingredients)
             return
 
         def eligible_for_allergen(ing, allerg):
@@ -241,10 +67,15 @@ for line in sys.stdin:
     s.add_food(ingredients, allergens)
 
 s.solve()
-print(s.allergy_free_ingredients)
 
 c = Counter()
 for f_i, _ in s.foods:
     c.update(f_i & s.allergy_free_ingredients)
-    
+
+# Part 1:
 print(sum(c.values()))
+
+# Part 2:
+print(
+    ",".join(k for k, _ in sorted(s.solution.items(), key=itemgetter(1)))
+)
