@@ -1,7 +1,6 @@
 from collections import Counter
 import copy
 from operator import itemgetter
-from pprint import pprint
 import sys
 
 class Solver:
@@ -23,17 +22,17 @@ class Solver:
         self.ingredients[ingredient] = allergen
         self.unassigned_ingredients.remove(ingredient)
         self.unassigned_allergens.remove(allergen)
-        foods_copy = copy.deepcopy(self.foods)
-        for food_ingredients, food_allergens in self.foods:
-            food_ingredients.discard(ingredient)
-            food_allergens.discard(allergen)
-        return foods_copy
 
-    def unassign(self, ingredient, allergen, foods_copy):
-        self.foods = foods_copy
+    def unassign(self, ingredient, allergen):
         del self.ingredients[ingredient]
         self.unassigned_ingredients.add(ingredient)
         self.unassigned_allergens.add(allergen)
+
+    def eligible_for_allergen(self, ing, allerg):
+        for fi, fa in self.foods:
+            if allerg in fa and ing not in fi:
+                return False
+        return True
 
     def solve(self):
         if not self.unassigned_allergens:
@@ -42,21 +41,13 @@ class Solver:
                 self.solution = copy.deepcopy(self.ingredients)
             return
 
-        def eligible_for_allergen(ing, allerg):
-            for fi, fa in self.foods:
-                if allerg in fa and ing not in fi:
-                    return False
-            return True
-
         for ingredient in self.unassigned_ingredients:
-            candidate_allergens = set(self.unassigned_allergens)
-            for allergen in candidate_allergens:
-                if not eligible_for_allergen(ingredient, allergen):
+            for allergen in self.unassigned_allergens:
+                if not self.eligible_for_allergen(ingredient, allergen):
                     continue
-
-                foods_copy = self.assign(ingredient, allergen)
+                self.assign(ingredient, allergen)
                 self.solve()
-                self.unassign(ingredient, allergen, foods_copy)
+                self.unassign(ingredient, allergen)
 
 s = Solver()
 
