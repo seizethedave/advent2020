@@ -39,15 +39,19 @@ class Solver:
             self.allergy_free_ingredients &= self.unassigned_ingredients
             if self.solution is None:
                 self.solution = copy.deepcopy(self.ingredients)
-            return
+            return True
 
         for ingredient in self.unassigned_ingredients:
             for allergen in self.unassigned_allergens:
                 if not self.eligible_for_allergen(ingredient, allergen):
                     continue
                 self.assign(ingredient, allergen)
-                self.solve()
+                solved = self.solve()
                 self.unassign(ingredient, allergen)
+                if solved:
+                    return True
+        else:
+            return False
 
 s = Solver()
 
