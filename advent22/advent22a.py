@@ -27,6 +27,6 @@ while d1 and d2:
         d2.append(c1)
 
 def score_deck(deck):
-    return sum((len(deck) - i) * c for i, c in enumerate(deck))
+    return sum(i * c for i, c in enumerate(reversed(deck), start=1))
 
 print(score_deck(d1 or d2))
