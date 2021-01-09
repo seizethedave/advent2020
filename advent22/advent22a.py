@@ -1,20 +1,17 @@
 import sys
 from collections import deque
 
-def get_decks():
-    def read_one_deck():
-        sys.stdin.readline()
-        d = deque()
-        for line in sys.stdin:
-            line = line.strip()
-            if not line:
-                break
-            d.append(int(line))
-        return d
+def read_one_deck():
+    sys.stdin.readline()
+    d = deque()
+    for line in sys.stdin:
+        line = line.strip()
+        if not line:
+            break
+        d.append(int(line))
+    return d
 
-    return read_one_deck(), read_one_deck()
-
-d1, d2 = get_decks()
+d1, d2 = read_one_deck(), read_one_deck()
 
 while d1 and d2:
     c1, c2 = d1.popleft(), d2.popleft()
